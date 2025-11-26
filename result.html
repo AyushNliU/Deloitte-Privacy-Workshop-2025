@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <title>Deloitte – User Details</title>
+
+  <style>
+    :root{
+      --green: #86BC25;
+      --bg: #040404;
+      --card: rgba(255,255,255,0.03);
+      --muted: rgba(255,255,255,0.68);
+      --muted-2: rgba(255,255,255,0.46);
+    }
+    html,body{
+      height:100%;
+      margin:0;
+      background:var(--bg);
+      color:#fff;
+      font-family:"Open Sans", Calibri, Helvetica, sans-serif;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    /* container */
+    .container {
+      max-width:980px;
+      margin:0 auto;
+      padding:28px;
+    }
+
+    /* header */
+    header { padding:18px 0; }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand img { width:120px; height:auto; }
+    .brand .muted { color:var(--muted); font-size:14px; }
+
+    /* card */
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.04);
+      padding:30px;
+      border-radius:14px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.65);
+    }
+
+    /* title */
+    .title-row { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:6px; }
+    .title-left { display:flex; flex-direction:column; gap:6px; }
+    .title-main { font-size:24px; font-weight:800; color:var(--green); }
+    .title-sub { color:var(--muted-2); font-size:14px; letter-spacing:0.06em; text-transform:uppercase; }
+
+    /* small identifier text */
+    #searchValue { color:#fff; font-weight:700; font-size:16px; }
+
+    /* loading */
+    #loading { display:flex; justify-content:center; align-items:center; padding:28px 0; }
+    .spinner { border:6px solid #f3f3f3; border-top:6px solid var(--green); border-radius:50%; width:54px; height:54px; animation:spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* data table */
+    .data-table { width:100%; border-collapse:collapse; margin-top:8px; }
+    .row { display:grid; grid-template-columns: 34% 1fr; gap:12px; padding:14px; border-radius:10px; background: rgba(0,0,0,0.36); border:1px solid rgba(255,255,255,0.02); transform:translateY(10px); opacity:0; transition: transform .42s cubic-bezier(.2,.9,.2,1), opacity .42s; }
+    .row.show { transform:none; opacity:1; }
+    .label { color:var(--muted); font-weight:700; }
+    .value { color:#fff; font-weight:700; word-break:break-word; }
+
+    /* breach badge */
+    .breachBadge {
+      display:inline-block;
+      padding:10px 14px;
+      border-radius:10px;
+      font-weight:800;
+      background: linear-gradient(180deg, rgba(134,188,37,0.10), rgba(134,188,37,0.04));
+      color:#fff;
+      border-left:4px solid var(--green);
+      font-size:13px;
+    }
+
+    /* footer */
+    footer { margin-top:28px; background:#fff; color:#333; padding:18px; border-radius:8px; font-size:13px; }
+
+    @media (max-width:820px){
+      .row { grid-template-columns: 1fr; }
+      .title-row { flex-direction:column; align-items:flex-start; gap:10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV (logo-only) -->
+<header class="body-font bg-black">
+  <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
+
+    <!-- Deloitte SVG Logo -->
+    <a class="flex items-center mb-4 md:mb-0" href="#">
+      <img src="deloitte.svg" alt="Deloitte Logo" class="w-28 h-auto" />
+    </a>
+
+    <nav class="md:ml-auto flex flex-wrap items-center text-base justify-center">
+      <span class="text-white text-lg">Digital Privacy & Trust</span>
+    </nav>
+
+  </div>
+</header>
+
+  <!-- MAIN -->
+  <main>
+    <div class="container">
+      <div class="card">
+
+        <!-- Title area -->
+        <div class="title-row">
+          <div class="title-left">
+            <div class="title-main">Captured Data</div>
+            <div class="title-sub">Presenting captured details</div>
+            <div style="margin-top:8px; color:var(--muted-2); font-size:13px;">Identifier: <span id="searchValue"></span></div>
+          </div>
+
+          <!-- Breach badge (script can be extended later to populate if required) -->
+          <div id="breachWrap" aria-hidden="false">
+            <span id="breachBadge" class="breachBadge">Previously exposed in 0 breaches</span>
+          </div>
+        </div>
+
+        <!-- Loading spinner (script will toggle #loading) -->
+        <div id="loading"><div class="spinner" aria-hidden="true"></div></div>
+
+        <!-- Data container (script toggles visibility) -->
+        <div id="dataContainer" style="display:none;">
+          <div class="data-table">
+            <div class="row">
+              <div class="label">Name</div>
+              <div class="value" id="name"></div>
+            </div>
+
+            <div class="row">
+              <div class="label">Official Email</div>
+              <div class="value" id="email"></div>
+            </div>
+
+            <div class="row">
+              <div class="label">Phone</div>
+              <div class="value" id="phone"></div>
+            </div>
+
+            <div class="row">
+              <div class="label">Personal Email Address</div>
+              <div class="value" id="pemail"></div>
+            </div>
+
+            <div class="row">
+              <div class="label">Company</div>
+              <div class="value" id="companyname"></div>
+            </div>
+
+            <div class="row">
+              <div class="label">IP Address</div>
+              <div class="value" id="ipinfo"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+<footer class="bg-white px-6 py-10" style="font-family: Arial, sans-serif;">
+  <div class="w-full flex flex-col md:flex-row justify-between items-start gap-8">
+
+    <!-- LEFT: Deloitte Logo + Label -->
+    <div class="flex-shrink-0">
+      <img src="Deloitte_Black.png" alt="Deloitte Logo" class="w-32 h-auto mb-2" />
+      <p class="text-[#333] text-sm font-semibold" style = "font-family: Open Sans, Calibri, Helvetica, sans-serif;">Digital Privacy & Trust</p>
+    </div>
+
+    <!-- RIGHT: Centered + Justified Text -->
+    <div class="text-[#333] text-[12px] leading-relaxed max-w-xl mx-auto md:mx-0 text-justify">
+
+      <p class="mb-4 text-center">
+        © 2025 Deloitte Touche Tohmatsu India LLP. See Terms of Use for more information.
+      </p>
+
+      <p class="mb-4">
+        Deloitte Touche Tohmatsu India Private Limited (U74140MH199 5PTC093339) a private
+        company limited by shares was converted into Deloitte Touche Tohmatsu India LLP, a
+        limited liability partnership (LLP Identification No. AAE-8458) with effect from October 1, 2015.
+      </p>
+
+      <p>
+        Deloitte refers to one or more of Deloitte Touche Tohmatsu Limited, a UK private company
+        limited by guarantee (“DTTL”), its network of member firms, and their related entities.
+        DTTL and each of its member firms are legally separate and independent entities.  
+        DTTL (also referred to as “Deloitte Global”) does not provide services to clients.
+        Please see www.deloitte.com/about to learn more about our global network of member firms.
+      </p>
+
+    </div>
+
+  </div>
+</footer>
+
+  <!-- YOUR ORIGINAL SCRIPT — NOT CHANGED (copied verbatim) -->
+  <script>
+        const API_URL = "https://sheetdb.io/api/v1/txjcn5sgwbquw";
+        const API_KEY = "eee5ea35ce7044d7a4cac30cd5d28045"; // ipgeolocation.io key
+
+        window.onload = async function () {
+            const loading = document.getElementById("loading");
+            const dataContainer = document.getElementById("dataContainer");
+            const ipInfoTd = document.getElementById("ipinfo");
+
+            loading.style.display = "flex";
+            dataContainer.style.display = "none";
+
+            const params = new URLSearchParams(window.location.search);
+            const query = params.get("query") || "";
+            document.getElementById("searchValue").textContent = query;
+
+            if (!query) {
+                fillNotFound();
+                return;
+            }
+
+            let searchURL = query.includes("@")
+                ? `${API_URL}/search?email=${encodeURIComponent(query)}`
+                : `${API_URL}/search?phoneno=${encodeURIComponent(query)}`;
+
+            try {
+                // Fetch user data
+                const response = await fetch(searchURL);
+                const data = await response.json();
+
+                let user;
+                if (!data || data.length === 0) {
+                    fillNotFound();
+                    return;
+                } else {
+                    user = data[0];
+                }
+
+                document.getElementById("name").textContent = user.name || "-";
+                document.getElementById("email").textContent = user.email || "-";
+                document.getElementById("phone").textContent = user.phoneno || "-";
+                document.getElementById("pemail").textContent = user.pemail || "-";
+                document.getElementById("companyname").textContent = user.Companyname || "-";
+
+                // Fetch IP info
+                let ipData = {};
+                try {
+                    const ipResponse = await fetch(`https://api.ipgeolocation.io/ipgeo?apiKey=${API_KEY}`);
+                    ipData = await ipResponse.json();
+                } catch (err) {
+                    console.warn("Unable to fetch IP info", err);
+                }
+
+                ipInfoTd.textContent = `${ipData.ip || "-"} (${ipData.city || ""}, ${ipData.state_prov || ""}, ${ipData.country_name || ""}, ${ipData.isp || ""})`;
+
+            } catch (err) {
+                console.error("Error fetching data:", err);
+                fillNotFound();
+            } finally {
+                loading.style.display = "none";
+                dataContainer.style.display = "block";
+                // animate rows in
+                const rows = document.querySelectorAll('.row');
+                rows.forEach((r, i) => setTimeout(()=> r.classList.add('show'), i*110 + 120));
+            }
+        };
+
+        function fillNotFound() {
+            document.getElementById("name").textContent = "Not found";
+            document.getElementById("email").textContent = "-";
+            document.getElementById("phone").textContent = "-";
+            document.getElementById("pemail").textContent = "-";
+            document.getElementById("companyname").textContent = "-";
+            document.getElementById("ipinfo").textContent = "-";
+
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("dataContainer").style.display = "block";
+
+            // animate rows in
+            const rows = document.querySelectorAll('.row');
+            rows.forEach((r, i) => setTimeout(()=> r.classList.add('show'), i*110 + 120));
+        }
+  </script>
+
+</body>
+</html>
